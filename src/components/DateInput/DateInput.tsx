@@ -10,21 +10,27 @@ const DateInput: React.FC<DateInputProps> = ({ onDatesChange }) => {
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
 
-  const handleStartDateChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newStartDate = event.target.value;
-    setStartDate(newStartDate);
-    if (endDate) {
-      onDatesChange({ startDate: newStartDate, endDate });
-    }
-  }, [setStartDate, endDate, onDatesChange]);
+  const handleStartDateChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newStartDate = event.target.value; // Full datetime value
+      setStartDate(newStartDate);
+      if (endDate) {
+        onDatesChange({ startDate: newStartDate, endDate });
+      }
+    },
+    [setStartDate, endDate, onDatesChange]
+  );
 
-  const handleEndDateChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const newEndDate = event.target.value;
-    setEndDate(newEndDate);
-    if (startDate) {
-      onDatesChange({ startDate, endDate: newEndDate });
-    }
-  }, [setEndDate, startDate, onDatesChange]);
+  const handleEndDateChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const newEndDate = event.target.value; // Full datetime value
+      setEndDate(newEndDate);
+      if (startDate) {
+        onDatesChange({ startDate, endDate: newEndDate });
+      }
+    },
+    [setEndDate, startDate, onDatesChange]
+  );
 
   return (
     <motion.div
@@ -33,24 +39,26 @@ const DateInput: React.FC<DateInputProps> = ({ onDatesChange }) => {
       transition={{ duration: 0.5 }}
     >
       <Box sx={{ display: 'flex', gap: 2, flexDirection: 'row', alignItems: 'center', mt: 2 }}>
-        <FormControl variant="outlined" sx={{ flexGrow: 1, maxWidth: 300}}>
+        {/* Start Date-Time Picker */}
+        <FormControl variant="outlined" sx={{ flexGrow: 1, maxWidth: 300 }}>
           <TextField
-            id="start-date"
-            type="date"
+            id="start-datetime"
+            type="datetime-local" // Enables date and time input
             value={startDate}
             onChange={handleStartDateChange}
-            label="Start Date"
+            label="Start Date & Time"
             InputLabelProps={{ shrink: true }}
             fullWidth
           />
         </FormControl>
-        <FormControl variant="outlined" sx={{ flexGrow: 1, maxWidth: 300}}>
+        {/* End Date-Time Picker */}
+        <FormControl variant="outlined" sx={{ flexGrow: 1, maxWidth: 300 }}>
           <TextField
-            id="end-date"
-            type="date"
+            id="end-datetime"
+            type="datetime-local" // Enables date and time input
             value={endDate}
             onChange={handleEndDateChange}
-            label="End Date"
+            label="End Date & Time"
             InputLabelProps={{ shrink: true }}
             fullWidth
           />

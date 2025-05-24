@@ -1,16 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { EmissionData, fetchEmissionsByCountry, fetchEmissionsByCoordinates } from './emissionsAPI';
+import { EmissionData, fetchEmissionsByCoordinates } from './emissionsAPI';
 
 interface EmissionsState {
   data: EmissionData[];
   loading: boolean;
   error: string | null;
+  lastFetchedCoordinates: { lat: number; lng: number } | null;
+  lastFetchedDate: string | null;
 }
 
 const initialState: EmissionsState = {
   data: [],
   loading: false,
   error: null,
+  lastFetchedCoordinates: null,
+  lastFetchedDate: null
 };
 
 export const emissionsSlice = createSlice({
@@ -21,46 +25,42 @@ export const emissionsSlice = createSlice({
       state.data = [];
       state.error = null;
       state.loading = false;
-    },
+      state.lastFetchedCoordinates = null;
+      state.lastFetchedDate = null;
+    }
   },
   extraReducers: (builder) => {
     builder
-      // Handling fetchEmissionsByCountry
-      .addCase(fetchEmissionsByCountry.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchEmissionsByCountry.fulfilled, (state, action) => {
-        state.data = action.payload.sort((a, b) => {
-          const dateA = new Date(a.start).getTime();
-          const dateB = new Date(b.start).getTime();
-          return dateA - dateB;
-        });
-        state.loading = false;
-      })
-      .addCase(fetchEmissionsByCountry.rejected, (state, action) => {
-        state.error = action.error.message || 'Failed to fetch emissions by country';
-        state.loading = false;
-      })
-      // Handling fetchEmissionsByCoordinates
       .addCase(fetchEmissionsByCoordinates.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchEmissionsByCoordinates.fulfilled, (state, action) => {
-        state.data = action.payload.sort((a, b) => {
-          const dateA = new Date(a.start).getTime();
-          const dateB = new Date(b.start).getTime();
-          return dateA - dateB;
-        });
-        state.loading = false;
-      })
-      .addCase(fetchEmissionsByCoordinates.rejected, (state, action) => {
-        state.error = action.error.message || 'Failed to fetch emissions by coordinates';
-        state.loading = false;
-      });
-  },
+      .addCase(
+        fetchEmissionsByCoordinates.fulfilled,
+        (state, action: PayloadAction<EmissionData[]>) => {
+          state.data = action.payload.sort(
+            (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+          );
+          if (action.payload.length > 0) {
+            const firstItem = action.payload[0];
+            state.lastFetchedCoordinates = {
+              lat: firstItem.coordinates.latitude,
+              lng: firstItem.coordinates.longitude
+            };
+            state.lastFetchedDate = firstItem.dateTime;
+          }
+          state.loading = false;
+        }
+      )
+      .addCase(
+        fetchEmissionsByCoordinates.rejected,
+        (state, action) => {
+          state.error = action.payload as string || 'Failed to fetch emissions data';
+          state.loading = false;
+        }
+      );
+  }
 });
 
-export default emissionsSlice.reducer;
 export const { resetEmissionsData } = emissionsSlice.actions;
+export default emissionsSlice.reducer;

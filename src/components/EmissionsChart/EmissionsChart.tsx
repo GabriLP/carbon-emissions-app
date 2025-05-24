@@ -12,9 +12,8 @@ import {
 import { useTheme, Paper } from '@mui/material';
 
 interface EmissionData {
-  average: number;
-  start: string;
-  end: string;
+  value: number;
+  dateTime: string;
 }
 
 interface EmissionsChartProps {
@@ -36,9 +35,9 @@ const formatAverage = (average: number) => average.toFixed(4);
 const EmissionsChart: React.FC<EmissionsChartProps> = React.memo(({ data }) => {
   const theme = useTheme();
   const chartData = data.map((item: EmissionData) => ({
-    ...item,
-    start: formatDate(item.start),
-    average: formatAverage(item.average),
+    average: item.value,
+    start: formatDate(item.dateTime),
+    end: formatDate(item.dateTime),
   }));
 
   return (

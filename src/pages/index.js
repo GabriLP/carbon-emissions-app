@@ -1,8 +1,8 @@
 import React from 'react';
-import DataFetcher from '../components/DataFetcher/DataFetcher';
+import EmissionsCoordinate from './coordinate';
 
 const HomePage = () => {
-  return <DataFetcher />;
+  return <EmissionsCoordinate />;
 };
 
 export default HomePage;
